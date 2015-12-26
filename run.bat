@@ -95,18 +95,16 @@ echo --------------------------------------------------------------------
 echo.
 set /P d="[Que quieres hacer]"
 echo.
-if /i "%d%"=="1" goto :drivers
-if /i "%d%"=="2" goto :depusb
-if /i "%d%"=="3" goto :bootloader
-if /i "%d%"=="4" goto :lockbootloader
-if /i "%d%"=="5" goto :twrp
-if /i "%d%"=="6" goto :root
-if /i "%d%"=="7" goto :stockrecovery
-if /i "%d%"=="8" goto :imagenfabrica
-if /i "%d%"=="9" goto :adbfastboot
-if /i "%d%"=="10" goto :ixposed
-if /i "%d%"=="11" goto :uxposed
-if /i "%d%"=="12" goto :uxposedBB
+if /i "%d%"=="1" goto :bootloader
+if /i "%d%"=="2" goto :lockbootloader
+if /i "%d%"=="3" goto :twrp
+if /i "%d%"=="4" goto :root
+if /i "%d%"=="5" goto :recoverystock
+if /i "%d%"=="6" goto :imagenfabrica
+if /i "%d%"=="7" goto :adbfastboot
+if /i "%d%"=="8" goto :ixposed
+if /i "%d%"=="9" goto :uxposed
+if /i "%d%"=="10" goto :uxposedBB
 if /i "%d%"=="0" goto :exit
 goto :EXIT
 
@@ -157,7 +155,7 @@ goto :EXIT
 echo Con este proceso vamos a instalar los drivers del Zuk Z1 muy rapidamente.
 echo.
 echo No hay requisitos para hacer este proceso.
-start Drivers/ZUK_Z1_Drivers.exe
+start Drivers/ZUK_Z1_Drivers.msi
 echo Seguid los pasos de la instalacion y eso es todo en este paso ;).
 pause
 echo.
@@ -279,6 +277,22 @@ SET /P INPUT=- Ingresa la opcion deseada:
 IF /I '%INPUT%'=='1' GOTO :menu
 IF /I '%INPUT%'=='2' GOTO :depusb
 
+:lockbootloader
+
+echo En el paso vamos a bloquear el bootloader.
+echo.
+echo Cuando estés listo para proceder, haz clic en el toolkit para continuar.
+pause
+adb devices
+adb wait-for-device
+adb reboot bootloader
+fastboot devices
+fastboot oem lock
+fastboot reboot
+echo Una vez se reinicie ya no hay que hacer nada mas. Eso es todo ;).
+pause
+goto :menu
+
 :twrp
 
 echo El requisito para instalar el recovery TWRP es este:
@@ -304,11 +318,10 @@ echo En el paso anterior nos has confirmado que cumples los requisitos.
 echo.
 echo Asi que vamos a hacer el proceso rapidamente ;).
 adb devices
-adb devices
 adb wait-for-device
 adb reboot bootloader
 fastboot devices
-fastboot -i 0x2b4c flash recovery ./Recovery/TWRP.img
+fastboot flash recovery Recovery/TWRP.img
 fastboot reboot
 echo Una vez se reinicie ya no hay que hacer nada mas. Eso es todo ;).
 pause
@@ -339,11 +352,10 @@ echo En el paso anterior nos has confirmado que cumples los requisitos.
 echo.
 echo Asi que vamos a hacer el proceso rapidamente ;).
 adb devices
-adb devices
 adb wait-for-device
 adb reboot bootloader
 fastboot devices
-fastboot -i 0x2b4c flash recovery Recovery/stock.img
+fastboot flash recovery Recovery/stock.img
 fastboot reboot
 echo Una vez se reinicie ya no hay que hacer nada mas. Eso es todo ;).
 pause
@@ -1094,7 +1106,7 @@ pause
 mkdir bootanimation
 echo Renombra el archivo a bootanimation.zip "si no, no funcionara" ya
 echo mueve el archivo a la carpeta bootanimation.
-main\adb.exe push bootanimation\bootanimation.zip /system/media/bootanimation.zip
+adb push bootanimation\bootanimation.zip /system/media/bootanimation.zip
 echo Eso es todo, ahora solo hay que reiniciar el dispositivo y finito :).
 pause
 adb reboot
